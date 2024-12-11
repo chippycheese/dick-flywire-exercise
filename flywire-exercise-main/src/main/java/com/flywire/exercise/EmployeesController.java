@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -39,9 +40,27 @@ public class EmployeesController {
 
     //Create an http request endpoint that takes a date range, and returns a JSON response of all employees hired in
     //that date range. Sort by descending order of date hired.
-    @GetMapping(value = "/date/{date1}/{date2}")
-    public Employee[] getDateRange(@PathVariable String date1,@PathVariable String date2) {
-        return null;
+    @PostMapping(value = "/date")
+    public List<Employee> getDateRange(@RequestBody DateFindRequest request){
+        if(!DateHelper.isValidDate(request.StartDate) || !DateHelper.isValidDate(request.EndDate) ){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Bad Request"
+            );
+        }
+        List<Employee> employees = service.getEmployeeDateRange(request.StartDate, request.EndDate);
+        Collections.sort(employees, new Comparator<Employee>() {
+                    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+                    @Override
+                    public int compare(Employee e1, Employee e2) {
+                        try {
+                            return sdf.parse(e2.hireDate).compareTo(sdf.parse(e1.hireDate));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            return 0; // Default in case of error
+                        }
+                    }
+        });
+        return employees;
     }
 
     //Create an http request endpoint that takes a name, id, position, direct reports, and manager to creates a new

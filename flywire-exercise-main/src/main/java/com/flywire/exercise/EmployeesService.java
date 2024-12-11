@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeesService {
@@ -36,6 +37,12 @@ public class EmployeesService {
         return employees.stream()
                 .filter(employee -> employee.id == id)
                 .findFirst();
+    }
+
+    public List<Employee> getEmployeeDateRange(String startDate, String endDate){
+        return employees.stream()
+                .filter(employee -> DateHelper.isDateBetween(employee.hireDate, startDate, endDate))
+                .collect(Collectors.toList());
     }
 
     public String[] getDirectHireNames(Employee employee){

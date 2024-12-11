@@ -15,7 +15,6 @@ public class FindEmployeeResponse {
         return nameParts[nameParts.length - 1]; // Get the last part of the name
     }
 
-    public FindEmployeeResponse(){}
 
     public FindEmployeeResponse(Employee newEmployeeRequest){
         this.active = true;
