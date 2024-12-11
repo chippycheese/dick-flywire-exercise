@@ -25,10 +25,12 @@ public class EmployeesController {
     //Create an http request endpoint that takes in an ID and returns a JSON response of the matching employees,
     // as well as the names of their direct hires. Employee IDs are unique.
     @GetMapping(value = "/{id}")
-    public Employee getId(@PathVariable int id) {
+    public FindEmployeeResponse getId(@PathVariable int id) {
         Optional<Employee> employee = service.getId(id);
         if(employee.isPresent()){
-            return employee.get();
+            FindEmployeeResponse response = new FindEmployeeResponse(employee.get());
+            response.directReportsNames = service.getDirectHireNames(employee.get());
+            return response;
         }
         throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "employee not found"
@@ -45,8 +47,14 @@ public class EmployeesController {
     //Create an http request endpoint that takes a name, id, position, direct reports, and manager to creates a new
     //employee. The employee should be added to the JSON file. Add any validation and error handling you see fit.
     @PostMapping(value = "")
-    public Employee getId(@RequestBody Employee nEmployee) {
-        return null;
+    public Employee create(@RequestBody NewEmployeeRequest nEmployee) {
+        Optional<Employee> employee = service.newEmployee(nEmployee);
+        if(employee.isPresent()){
+            return employee.get();
+        }
+        throw new ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create"
+        );
     }
 
     // Create an http request endpoint that takes in an ID and deactivates an employee. Add any validation you see fit.

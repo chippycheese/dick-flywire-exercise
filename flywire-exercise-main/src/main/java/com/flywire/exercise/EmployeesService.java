@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class EmployeesService {
@@ -36,17 +33,19 @@ public class EmployeesService {
     }
 
     public Optional<Employee> getId(int id){
-        Optional<Employee> fEmployee = employees.stream()
+        return employees.stream()
                 .filter(employee -> employee.id == id)
                 .findFirst();
-        if(fEmployee.isPresent()) {
-            List<String> dNames = new ArrayList<>();
-            for(int dReport : fEmployee.get().directReports){
-                dNames.add(getEmployeeName(dReport));
-                fEmployee.get().directReportsNames = dNames.toArray(new String[0]);
-            }
+    }
+
+    public String[] getDirectHireNames(Employee employee){
+        List<String> dNames = new ArrayList<>();
+        String[] directReportsNames = null;
+        for(int dReport : employee.directReports){
+            dNames.add(getEmployeeName(dReport));
+            directReportsNames = dNames.toArray(new String[0]);
         }
-        return fEmployee;
+        return directReportsNames;
     }
 
     public String getEmployeeName(int id){
@@ -54,6 +53,53 @@ public class EmployeesService {
                 .filter(employee -> employee.id == id)
                 .findFirst();
         return fEmployee.map(employee -> employee.name).orElse(null);
+    }
+
+    public Optional<Employee> newEmployee(NewEmployeeRequest nEmployee){
+        if(!validateNewEmployeeRequest(nEmployee)){
+            return Optional.empty();
+        }
+        employees.add(new Employee(nEmployee));
+        SaveDataFile();
+        if(nEmployee.manager != null){
+            AddNewDirectReport(nEmployee.manager, nEmployee.id);
+        }
+
+
+        return getId(nEmployee.id);
+    }
+
+    private boolean validateNewEmployeeRequest(NewEmployeeRequest nEmployee){
+        if(nEmployee.name.split(" ").length <= 1){
+            System.out.println("Bad Name");
+            return false;
+        }
+        if(!DateHelper.isValidDate(nEmployee.hireDate)){
+            return false;
+        }
+        if(getId(nEmployee.id).isPresent()){
+            System.out.println("ID Present");
+            return false;
+        }
+        if(nEmployee.manager != null && !getId(nEmployee.manager).isPresent()){
+            System.out.println("Manager not found");
+            return false;
+        }
+        for(int report : nEmployee.directReports){
+            if(!getId(report).isPresent()){
+                System.out.println("Direct Report Not Found");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void AddNewDirectReport(int managerId, int employeeId){
+        Optional<Employee> manager = getId(managerId);
+        int[] reports = manager.get().directReports;
+        int[] newReports = Arrays.copyOf(reports, reports.length + 1);
+        newReports[reports.length] = employeeId;
+        manager.get().directReports = newReports;
     }
 
     public boolean deactivate(int id){
@@ -68,18 +114,12 @@ public class EmployeesService {
 
     private void SaveDataFile(){
         File file = new File("src/main/resources/json/data.json");
-
-        // Create an ObjectMapper instance to handle the conversion to JSON
         ObjectMapper objectMapper = new ObjectMapper();
-
         try {
-            // Write the list to the JSON file
             objectMapper.writeValue(file, employees);
             System.out.println("Employees have been written to json/data.json");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-
 }

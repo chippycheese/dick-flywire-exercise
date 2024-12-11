@@ -1,9 +1,6 @@
 package com.flywire.exercise;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class Employee {
+public class FindEmployeeResponse {
 
     public boolean active;
     public int[] directReports;
@@ -18,9 +15,9 @@ public class Employee {
         return nameParts[nameParts.length - 1]; // Get the last part of the name
     }
 
-    public Employee(){}
+    public FindEmployeeResponse(){}
 
-    public Employee(NewEmployeeRequest newEmployeeRequest){
+    public FindEmployeeResponse(Employee newEmployeeRequest){
         this.active = true;
         directReports = newEmployeeRequest.directReports;
         hireDate = newEmployeeRequest.hireDate;
