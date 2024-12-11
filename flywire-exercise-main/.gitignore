@@ -1,0 +1,33 @@
+# Compiled class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Target directory
+target/
+
+# Log files
+*.log
+
+# IDE files
+.idea/
+.classpath
+.project
+.settings/
+
+# Maven/Gradle build files
+/.mvn/
+/mvnw
+/mvnw.cmd
+/gradlew
+/gradlew.bat
+/gradle/wrapper/
+
+# Other temporary files
+*.iml
+*.ipr
+*.iws
+*.swp
