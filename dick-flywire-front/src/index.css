@@ -19,7 +19,6 @@
 }
 
 body {
-  /* background-color: slategrey; */
   margin: 0;
 }
 
@@ -38,11 +37,21 @@ a {
 }
 
 .table-button{
-  width: 100%;
+  width: calc(100% - 10px);
   margin: 4px;
 }
 .v-bar{
   display: inline-block;
   width: 2%;
+}
+
+.side-bar-info{
+  display: inline-block;
+  width: 80%;
+}
+.x-button{
+  vertical-align: top;
+  display: inline-block;
+  width: 20%;
 }
 

@@ -13,12 +13,16 @@ function Home() {
 
   const [selectedEmployee, setSelectedEmployee] = useState<Employee>(null);
   const [directHires, setDirectHires] = useState<Employee[]>([]);
+  const [filterName, setFilterName] = useState('');
 
   const handleSelect = (employee: Employee) => {
     setSelectedEmployee(employee)
+    if(employee === null){
+      return;
+    }
     var dHires = []
     employee.directReports.forEach(dHireId => {
-      dHires.push(employees.find(employee => employee.id == dHireId));
+      dHires.push(employees.find(employee => employee.id === dHireId));
     });
     setDirectHires(dHires);
   }
@@ -64,16 +68,31 @@ function Home() {
       setLoading(false);
     }
   };
-
+  
   return (
     <>
       <nav className="navbar navbar-dark bg-dark">
         <span className='title-text white title-padding'>Employee List</span>
       </nav>
+
+      
+
       {loading && <p>Loading...</p>}
       {!loading &&
         <table className={selectedEmployee ? 'table table-striped table-compress' : 'table table-striped'}>
           <thead>
+            <tr>
+              <th/>
+              <th><input 
+        type="text" 
+        placeholder="Filter by name" 
+        value={filterName} 
+        onChange={(e) => setFilterName(e.target.value)} 
+      /></th>
+      <th/>
+      <th/>
+      <th/>
+            </tr>
             <tr>
               <th onClick={() => handleSort('id')} scope="col">Id {SortButton("id", sortColumn, sortOrder)}</th>
               <th onClick={() => handleSort('name')} scope="col">Name {SortButton("name", sortColumn, sortOrder)}</th>
@@ -83,8 +102,7 @@ function Home() {
             </tr>
           </thead>
           <tbody>
-
-            {employees.map((employee: Employee) => (
+            {employees.filter(employee => employee.name.toLocaleLowerCase().includes(filterName.toLocaleLowerCase()) ).map((employee: Employee) => (
               <tr key={employee.id}>
                 <th scope="row">{employee.id}</th>
                 <td  >{employee.name}</td>
@@ -100,6 +118,7 @@ function Home() {
       {!loading && selectedEmployee && <>
         <div className='v-bar' />
         <div className='side-bar'>
+          <div className='side-bar-info'>
           <p><strong>Name :</strong>{" "+ selectedEmployee.name}</p>
           <p><strong>Position :</strong>{" "+selectedEmployee.position}</p>
           <p><strong>Hire Date :</strong>{" "+selectedEmployee.hireDate}</p>
@@ -113,7 +132,9 @@ function Home() {
           </>
           }
 
-
+          </div>
+          <div className='x-button'>
+            <div className='btn btn-secondary' onClick={() => handleSelect(null)}>X</div></div>
         </div>
       </>}
     </>
